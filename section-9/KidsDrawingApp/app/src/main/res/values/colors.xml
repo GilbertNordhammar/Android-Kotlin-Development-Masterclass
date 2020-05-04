@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#4CAF50</color>
+    <color name="colorPrimaryDark">#E5DE9B</color>
+    <color name="colorAccent">#3F9495</color>
+
+    <color name="colorPalletBorderDefault">#000000</color>
+    <color name="colorPalletBorderSelected">#54D354</color>
+    <color name="colorBackgroundPalletItem">#FFFFFF</color>
+    <color name="skin">#CCA29F</color>
+    <color name="black">#000000</color>
+    <color name="red">#EE3224</color>
+    <color name="green">#30BD26</color>
+    <color name="blue">#1B55B8</color>
+    <color name="yellow">#E9D411</color>
+    <color name="lollipop">#36F4B8</color>
+    <color name="random">#C055EE</color>
+</resources>
