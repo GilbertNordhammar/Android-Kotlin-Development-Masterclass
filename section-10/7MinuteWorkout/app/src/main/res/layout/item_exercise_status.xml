@@ -4,11 +4,14 @@
     android:id="@+id/textView_item"
     android:layout_width="25dp"
     android:layout_height="25dp"
+    android:adjustViewBounds="true"
     android:layout_margin="1dp"
     android:gravity="center"
     android:textColor="#2E2C2C"
     android:textSize="14sp"
     android:textStyle="bold"
-    tools:text="1">
+    tools:text="1"
+    android:background="@drawable/item_circular_color_gray_background"
+    >
 
 </TextView>

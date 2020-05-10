@@ -7,7 +7,9 @@ import android.os.CountDownTimer
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_exercise.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -25,8 +27,8 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var _currentExcercisePosition = -1
 
     private lateinit var _textToSpeech: TextToSpeech
-
     private val _mediaPlayer by lazy {MediaPlayer.create(applicationContext, R.raw.press_start)}
+    private var _exerciseAdapter: ExerciseStatusAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +43,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         _textToSpeech = TextToSpeech(this, this)
         _excerciseList = Exercises.defaultExcerciseList()
         setupRestView()
+        setupExerciseStatusRecyclerView()
     }
 
     override fun onDestroy() {
@@ -132,5 +135,12 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         } else {
             Log.e("Text To Speach", "Initialization failed!")
         }
+    }
+
+    private fun setupExerciseStatusRecyclerView() {
+        recyclerView_exerciseStatus.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        _exerciseAdapter = ExerciseStatusAdapter(_excerciseList!!, this)
+        recyclerView_exerciseStatus.adapter = _exerciseAdapter
     }
 }
