@@ -24,7 +24,8 @@
         android:layout_below="@id/toolbar_exercise_activity"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="visible"
+        android:layout_margin="20dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -70,6 +71,23 @@
                     android:text="10" />
             </LinearLayout>
         </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upcoming exercise"
+            android:textColor="#CA515151"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/textView_upcoming_exercise_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="exercise_name"
+            android:textColor="#CA000000"
+            android:textStyle="bold"
+            android:textSize="30sp"
+            android:textAlignment="center"/>
     </LinearLayout>
 
     <LinearLayout
@@ -79,9 +97,22 @@
         android:layout_below="@id/toolbar_exercise_activity"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:layout_margin="20dp"
+        >
+
+        <ImageView
+            android:id="@+id/imageView_exercise_image"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:scaleType="fitXY"
+            android:layout_weight="1"
+            android:contentDescription="@string/image"
+            android:src="@drawable/ic_jumping_jacks"
+            />
 
         <TextView
+            android:id="@+id/textView_exercise_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="(Excercise Name)"

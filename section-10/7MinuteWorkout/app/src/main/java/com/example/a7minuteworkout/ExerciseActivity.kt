@@ -1,22 +1,32 @@
 package com.example.a7minuteworkout
 
-import android.opengl.Visibility
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_exercise.*
+import java.util.*
+import kotlin.collections.ArrayList
 
-class ExerciseActivity : AppCompatActivity() {
+class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     companion object {
-        private const val MAX_EXERCISE_TIME_IN_MILLISECONDS: Long = 30000
-        private const val MAX_REST_TIME_IN_MILLISECONDS: Long = 10000
+        private const val EXERCISE_TIME_IN_MILLISECONDS: Long = 5000
+        private const val REST_TIME_IN_MILLISECONDS: Long = 5000
         private const val COUNTDOWN_INTERVAL_IN_MILLISECONDS: Long = 1000
     }
 
     private var _countdownTimer: CountDownTimer? = null
+    private var _excerciseList: ArrayList<ExerciseModel>? = null
+    private var _currentExcercisePosition = -1
+
+    private lateinit var _textToSpeech: TextToSpeech
+
+    private val _mediaPlayer by lazy {MediaPlayer.create(applicationContext, R.raw.press_start)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,12 +38,19 @@ class ExerciseActivity : AppCompatActivity() {
             onBackPressed()
         }
 
+        _textToSpeech = TextToSpeech(this, this)
+        _excerciseList = Exercises.defaultExcerciseList()
         setupRestView()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         _countdownTimer?.cancel()
+
+        _textToSpeech.stop()
+        _textToSpeech.shutdown()
+
+        _mediaPlayer.stop()
     }
 
     private fun startCountdown(maxTime: Long, onFinish: () -> Unit, onTick: (secondsUntilFinished: Int) -> Unit) {
@@ -51,16 +68,19 @@ class ExerciseActivity : AppCompatActivity() {
     }
 
     private fun setupRestView() {
-        progressbar_rest_view.max = (MAX_REST_TIME_IN_MILLISECONDS / 1000).toInt()
+        _mediaPlayer.isLooping = false
+        _mediaPlayer.start()
+
+        linearlayout_rest_view.visibility = View.VISIBLE
+        progressbar_rest_view.max = (REST_TIME_IN_MILLISECONDS / 1000).toInt()
         progressbar_rest_view.progress = 0
 
+        val upcomingExerciseName = _excerciseList!![_currentExcercisePosition + 1].getName()
+        textView_upcoming_exercise_name.text = upcomingExerciseName
+
         val onFinish = {
-            Toast.makeText(
-                this@ExerciseActivity,
-                "We will now start the exercise",
-                Toast.LENGTH_SHORT
-            ).show()
             linearlayout_rest_view.visibility = View.GONE
+            _currentExcercisePosition++
             setupExerciseView()
         }
 
@@ -69,20 +89,30 @@ class ExerciseActivity : AppCompatActivity() {
             textView_timer_rest_view.text = secondsUntilFinished.toString()
         }
 
-        startCountdown(MAX_REST_TIME_IN_MILLISECONDS, onFinish, onTick)
+        startCountdown(REST_TIME_IN_MILLISECONDS, onFinish, onTick)
     }
 
     private fun setupExerciseView() {
-        progressbar_exercise_view.max = (MAX_EXERCISE_TIME_IN_MILLISECONDS / 1000).toInt()
+        progressbar_exercise_view.max = (EXERCISE_TIME_IN_MILLISECONDS / 1000).toInt()
         progressbar_exercise_view.progress = 0
         linearlayout_excercise_view.visibility = View.VISIBLE
 
+        val currentExercise = _excerciseList!![_currentExcercisePosition]
+        imageView_exercise_image.setImageResource(currentExercise.getImage())
+        textView_exercise_name.text = currentExercise.getName()
+        _textToSpeech.speak(currentExercise.getName(), TextToSpeech.QUEUE_FLUSH, null, "")
+
         val onFinish = {
-            Toast.makeText(
-                this@ExerciseActivity,
-                "Here we will start the next rest screen",
-                Toast.LENGTH_SHORT
-            ).show()
+            linearlayout_excercise_view.visibility = View.GONE
+
+            if(_currentExcercisePosition < _excerciseList!!.size - 1)
+                setupRestView()
+            else
+                Toast.makeText(
+                    this@ExerciseActivity,
+                    "Congratulations! You have completed the 7 minutes workout",
+                    Toast.LENGTH_SHORT
+                ).show()
         }
 
         val onTick = { secondsUntilFinished: Int ->
@@ -90,6 +120,17 @@ class ExerciseActivity : AppCompatActivity() {
             textView_timer_exercise_view.text = secondsUntilFinished.toString()
         }
 
-        startCountdown(MAX_EXERCISE_TIME_IN_MILLISECONDS, onFinish, onTick)
+        startCountdown(EXERCISE_TIME_IN_MILLISECONDS, onFinish, onTick)
+    }
+
+    override fun onInit(status: Int) {
+        if(status == TextToSpeech.SUCCESS) {
+            val result = _textToSpeech.setLanguage(Locale.US)
+            if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("Text To Speech", "The specified language is not supported!")
+            }
+        } else {
+            Log.e("Text To Speach", "Initialization failed!")
+        }
     }
 }
